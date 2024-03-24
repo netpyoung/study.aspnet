@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+# ref: https://searchadvisor.naver.com/guide/seo-basic-robots
