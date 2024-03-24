@@ -1,4 +1,4 @@
-# study.site-template
+# study.aspnet
 
 ## mdBook
 

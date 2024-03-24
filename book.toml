@@ -1,13 +1,13 @@
 [book]
-title = "study.site-template"
-description = "study.site-template"
+title = "study.aspnet"
+description = "study.aspnet"
 language = "kr"
 multilingual = false
 src = "src"
 
 [output.html]
 no-section-label = true
-site-url = "/study.site-template/"
-git-repository-url = "https://github.com/netpyoung/study.site-template"
+site-url = "/study.aspnet/"
+git-repository-url = "https://github.com/netpyoung/study.aspnet"
 git-repository-icon = "fa-github"
-edit-url-template = "https://github.com/netpyoung/study.site-template/edit/main/{path}"
+edit-url-template = "https://github.com/netpyoung/study.aspnet/edit/main/{path}"
