@@ -133,3 +133,171 @@ Platform-Agnostic Security Tokens
 
 https://github.com/P-oke/SocialAuthentication/blob/master/SocialAuthentication/GoogleAuthentication/GoogleAuthService.cs
 https://github.com/joydipkanjilal/jwt-aspnetcore/blob/master/jwt-aspnetcore/Controllers/HomeController.cs
+
+
+================================
+## asp.net
+
+UseAuthentication() 인증
+UseAuthorization() 권한부여
+
+
+## Authentication 인증 - 너가 누군지
+
+https://docs.microsoft.com/en-us/aspnet/core/security/authentication/?view=aspnetcore-6.0#authentication-concepts
+	
+	Authentication scheme
+	The default authentication scheme, discussed in the next section.
+	Directly set HttpContext.User.
+
+
+	
+## Authorization 권한부여 - 어떠한 일을 할 수 있는지
+
+[Authorize] attribute 사용가능.
+ref: https://auth0.com/blog/securing-grpc-microservices-dotnet-core/
+
+
+===============
+
+ref
+https://docs.microsoft.com/en-us/aspnet/core/grpc/authn-and-authz
+https://docs.microsoft.com/en-us/aspnet/core/grpc/interceptors
+
+
+
+
+## server
+
+``` csharp
+builder.Services.AddGrpc(opts =>
+{
+	opts.Interceptors.Add<LoggerInterceptor>();
+});
+
+
+// ==============================
+public class LoggerInterceptor : Interceptor
+    {
+        private readonly ILogger<LoggerInterceptor> _logger;
+
+
+        public LoggerInterceptor(ILogger<LoggerInterceptor> logger)
+        {
+            _logger = logger;
+        }
+
+        public override async Task<TResponse> UnaryServerHandler<TRequest, TResponse>(
+            TRequest request,
+            ServerCallContext context,
+            UnaryServerMethod<TRequest, TResponse> continuation)
+        {
+            _logger.LogInformation($"before - {context.Method}");
+            TResponse response;
+            if (context.Method.EndsWith(nameof(WDService.RequestLogon)))
+            {
+                response = await base.UnaryServerHandler(request, context, continuation);
+            }
+            else
+            {
+                // Microsoft.AspNetCore.Http.IRequestCookieCollection cookie = context.GetHttpContext().Request.Cookies;
+                var ctx = context.GetHttpContext();
+                var header = context.GetHttpContext().Request.Headers;
+                var x = header["Authorization"];
+                Debug.Assert(x == "Bearer ");
+                response = await base.UnaryServerHandler(request, context, continuation);
+            }
+            _logger.LogInformation($"after - {context.Method}");
+
+            return response;
+        }
+
+        private void Log<TRequest, TResponse>(MethodType methodType, TRequest request, TResponse response,
+            ServerCallContext context)
+        {
+            _logger.LogInformation(
+                $"gRPC call. Type: {methodType}. Request: {request.ToString()}. Response: {response.ToString()}");
+        }
+    }
+// ==============
+public override async Task<R_RequestLogon> RequestLogon(Q_RequestLogon request, ServerCallContext context)
+{
+	Metadata m = new Metadata();
+	m.Add("Authorization", "x");
+	await context.WriteResponseHeadersAsync(m);
+
+```
+
+## client
+
+``` csharp
+Channel channel = new Channel("127.0.0.1:5299", ChannelCredentials.Insecure);
+CallInvoker invoker = channel.Intercept(new ClientLoggingInterceptor());
+WDService.WDServiceClient network = new WDService.WDServiceClient(invoker);
+
+// ===============
+  public class ClientLoggingInterceptor : Interceptor
+    {
+        public override AsyncUnaryCall<TResponse> AsyncUnaryCall<TRequest, TResponse>(
+            TRequest request,
+            ClientInterceptorContext<TRequest, TResponse> context,
+            AsyncUnaryCallContinuation<TRequest, TResponse> continuation)
+        {
+            Console.WriteLine($"EEE - before {context.Method.Name}");
+
+            if (context.Method.Name == nameof(WDService.WDServiceBase.RequestLogon))
+            {
+                jar = new CookieCollection();
+            }
+            else
+            {
+                Cookie cc = jar["Authorization"];
+                // handle cc == null
+                string ck = cc.Name;
+                string cv = cc.Value;
+                var m = new Metadata();
+                m.Add("Authorization", "Bearer ");
+                CallOptions op = context.Options.WithHeaders(m);
+                context = new ClientInterceptorContext<TRequest, TResponse>(context.Method, context.Host, op);
+            }
+
+            AsyncUnaryCall<TResponse> call = continuation(request, context);
+            return new AsyncUnaryCall<TResponse>(call.ResponseAsync, XY(call.ResponseHeadersAsync), call.GetStatus, call.GetTrailers, call.Dispose);
+        }
+
+        private async Task<Metadata> XY(Task<Metadata> responseHeadersAsync)
+        {
+            var meta = await responseHeadersAsync;
+            Metadata.Entry e = meta.Get("Authorization");
+            if (e != null)
+            {
+                var k = e.Key;
+                var v = e.Value;
+                jar.Add(new Cookie(k, v));
+            }
+            return meta;
+        }
+
+
+        CookieCollection jar = new CookieCollection(); //header jar
+    }
+```
+
+==================================
+==================================
+https://github.com/jwt-dotnet/jwt
+https://www.nuget.org/packages/JWT/8.9.0
+		<PackageReference Include="JWT" Version="8.9.0" />
+
+https://jasonwatmore.com/post/2021/06/02/net-5-create-and-validate-jwt-tokens-use-custom-jwt-middleware
+https://www.nuget.org/packages/System.IdentityModel.Tokens.Jwt/
+https://github.com/AzureAD/azure-activedirectory-identitymodel-extensions-for-dotnet
+<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.17.0" />
+
+
+https://gist.github.com/pradeepn/89646bd37de3bb3535de5582f0959610
+https://jasonwatmore.com/post/2020/05/25/aspnet-core-3-api-jwt-authentication-with-refresh-tokens
+
+
+
+https://velog.io/@tlatldms/%EC%84%9C%EB%B2%84%EA%B0%9C%EB%B0%9C%EC%BA%A0%ED%94%84-Refresh-JWT-%EA%B5%AC%ED%98%84
