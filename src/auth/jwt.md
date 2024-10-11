@@ -1,6 +1,31 @@
 # JWT
 
 
+
+https://learn.microsoft.com/en-us/aspnet/core/security/authentication/?view=aspnetcore-8.0
+https://learn.microsoft.com/en-us/aspnet/core/security/authorization/limitingidentitybyscheme?view=aspnetcore-8.0&viewFallbackFrom=aspnetcore-2.2&tabs=aspnetcore2x
+
+
+
+https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-8.0&tabs=windows
+프로젝트 간 공유 방지
+dotnet user-secrets init
+<PropertyGroup>
+  <UserSecretsId>79a3edd0-2092-40a2-a04d-dcb46d5ca9ed</UserSecretsId>
+
+
+dotnet user-secrets set "Movies:ServiceApiKey" "12345"
+In Windows : %Appdata%\Microsoft\UserSecrets\<guid>\secrets.json
+In Linux: ~/.microsoft/usersecrets/<guid>/secrets.json
+
+C:\Users\pyoung\AppData\Roaming\Microsoft\UserSecrets\984b9acf-23e3-4cdc-99f4-f46c36877269\secrets.json
+{
+  "Movies:ServiceApiKey": "12345"
+}
+
+
+
+
 ## 쿠키와 세션
 
 |           | 쿠키(Cookie)                                                           | 세션(Session)                                                     |
@@ -77,6 +102,12 @@
 
 
 ``` txt
+namespace System.IdentityModel.Tokens.Jwt;
+// Summary:
+//     List of registered claims from different sources https://datatracker.ietf.org/doc/html/rfc7519#section-4
+//     http://openid.net/specs/openid-connect-core-1_0.html#IDToken
+[StructLayout(LayoutKind.Sequential, Size = 1)]
+public struct JwtRegisteredClaimNames
 
 
 Header
@@ -138,8 +169,22 @@ https://github.com/joydipkanjilal/jwt-aspnetcore/blob/master/jwt-aspnetcore/Cont
 ================================
 ## asp.net
 
-UseAuthentication() 인증
-UseAuthorization() 권한부여
+순서 유지 중요.
+UseAuthentication() 인증 - 사용자가 누구인지 확인
+UseAuthorization() 권한부여 - 인증된 사용자가 특정 리소스에 접근할 수 있는지를 결정하는 정책을 설정
+services.AddAuthentication("Bearer")
+    .AddJwtBearer("Bearer", options =>
+    {
+        options.Authority = "https://your-auth-server/";
+        options.RequireHttpsMetadata = false;
+        options.Audience = "your-audience";
+    });
+
+services.AddAuthorization(options =>
+{
+    options.AddPolicy("AuthenticatedUser", policy => policy.RequireAuthenticatedUser());
+});
+[Authorize(Policy = "AuthenticatedUser")]
 
 
 ## Authentication 인증 - 너가 누군지
