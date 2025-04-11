@@ -2,7 +2,6 @@
 title = "study.aspnet"
 description = "study.aspnet"
 language = "ko"
-multilingual = false
 src = "src"
 
 [output.html]
