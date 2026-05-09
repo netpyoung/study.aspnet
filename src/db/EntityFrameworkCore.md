@@ -1,10 +1,49 @@
-EF(Entity Framework) Core
+# EF(Entity Framework) Core
+
+## OverView
+
+``` cs
+
+[Table(nameof(DTs_Item))]
+
+[PrimaryKey(nameof(ItemUID))]
+
+[Index(nameof(Id), IsUnique = true)]
+
+[Required]
+
+[Column(TypeName = "varchar(30)")]
+
+[MaxLength(20)]
+
+[NotMapped]
+
+[ForeignKey]
+
+[InverseProperty]
+
+[DbFunction]
+
+[Unicode(false)]
+
+[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+```
+
+``` sh
+dotnet tool install --global dotnet-ef  # dotnet ef 명령어 설치
+dotnet ef migrations add MigrationName
+dotnet ef database update
+dotnet ef database drop
+```
+
+
+##
 
 2008 - Entity Framework 1.0 (EF 1.0)  .NET Framework 3.5 SP1
 2016 Entity Framework의 완전한 재설계 버전. 기존 EF6에서 더 경량화된 버전으로 변경되었으며, .NET Core와 호환.
 
 
-ORM(Object Relational Mapping)
+- ORM(`O`bject `R`elational `M`apping)
 
 
 
@@ -16,7 +55,6 @@ SQL Server Express LocalDB
 https://learn.microsoft.com/ko-kr/sql/database-engine/configure-windows/sql-server-express-localdb?view=sql-server-ver16
 
 SSMS(SQL Server Management Studio)  https://learn.microsoft.com/ko-kr/sql/ssms/download-sql-server-management-studio-ssms?view=sql-server-ver16
-DBeaver https://dbeaver.io/download/
 
 SqlLocalDB 
 https://learn.microsoft.com/ko-kr/sql/tools/sqllocaldb-utility?view=sql-server-ver16
@@ -260,18 +298,6 @@ date
 0001-01-01 through 9999-12-31
 
 
-[Table(nameof(DTs_Item))]
-[PrimaryKey(nameof(ItemUID))]
-[Index(nameof(Id), IsUnique = true)]
-[Required]
-[Column(TypeName = "varchar(30)")]
-[MaxLength(20)]
-[NotMapped]
-[ForeignKey]
-[InverseProperty]
-[DbFunction]
-[Unicode(false)]
-[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 
 azure cli
 https://learn.microsoft.com/en-us/cli/azure/

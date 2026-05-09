@@ -18,3 +18,5 @@ UserToken
 | useruid | refresh_token |
 
 ```
+
+https://github.com/BcryptNet/bcrypt.net

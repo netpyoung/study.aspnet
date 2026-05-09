@@ -68,3 +68,10 @@ app.MapFallback()	요청에 대해 다른 라우트가 없을 때 실행될 "백
 app.MapWhen()	특정 조건이 충족될 때만 실행되는 라우트를 정의합니다.
 app.MapHub<T>()	SignalR 허브를 설정하여 실시간 웹 기능을 구현합니다. T는 허브 클래스의 타입을 의미합니다.
 app.MapBlazorHub()	Blazor 서버 애플리케이션에 필요한 SignalR 허브를 설정합니다.
+
+
+
+
+---
+
+FastEndpoints - https://fast-endpoints.com/

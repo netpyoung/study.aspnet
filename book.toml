@@ -8,5 +8,4 @@ src = "src"
 no-section-label = true
 site-url = "/study.aspnet/"
 git-repository-url = "https://github.com/netpyoung/study.aspnet"
-git-repository-icon = "fa-github"
 edit-url-template = "https://github.com/netpyoung/study.aspnet/edit/main/{path}"
